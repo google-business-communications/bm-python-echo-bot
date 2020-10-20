@@ -15,7 +15,8 @@
 """Webhook handler for receiving consumer messages and sending a response
 using the Business Messages API.
 
-The following commands are supported:
+In this step, there are defined TODOs within this file when
+completed will add functionality for the following commands:
 - card - Sends a sample rich card
 - carousel - Sends a sample carousel
 - chips - Sends a message with suggested replies
@@ -36,6 +37,7 @@ from businessmessages import businessmessages_v1_client as bm_client
 from businessmessages.businessmessages_v1_messages import (
     BusinessMessagesCarouselCard, BusinessMessagesCardContent, BusinessMessagesContentInfo,
     BusinessMessagesDialAction, BusinessmessagesConversationsMessagesCreateRequest,
+    BusinessmessagesConversationsEventsCreateRequest, BusinessMessagesEvent,
     BusinessMessagesOpenUrlAction, BusinessMessagesMedia, BusinessMessagesMessage,
     BusinessMessagesRepresentative, BusinessMessagesRichCard, BusinessMessagesStandaloneCard,
     BusinessMessagesSuggestion, BusinessMessagesSuggestedAction, BusinessMessagesSuggestedReply)
@@ -108,14 +110,11 @@ def route_message(message, conversation_id):
     '''
     normalized_message = message.lower()
 
-    if normalized_message == CMD_RICH_CARD:
-        send_rich_card(conversation_id)
-    elif normalized_message == CMD_CAROUSEL_CARD:
-        send_carousel(conversation_id)
-    elif normalized_message == CMD_SUGGESTIONS:
-        send_message_with_suggestions(conversation_id)
-    else:
-        echo_message(message, conversation_id)
+    # TODO: Update the routing to call the appropriate function
+    # based on matching the normalizedMessage value to the
+    # supported commands for chips, cards, and carousels.
+
+    echo_message(message, conversation_id)
 
 def send_rich_card(conversation_id):
     '''
@@ -124,30 +123,11 @@ def send_rich_card(conversation_id):
     Args:
         conversation_id (str): The unique id for this user and agent.
     '''
-    fallback_text = ('Business Messages!!!\n\n'
-                     + 'This is an example rich card\n\n' + SAMPLE_IMAGES[0])
-
-    rich_card = BusinessMessagesRichCard(
-        standaloneCard=BusinessMessagesStandaloneCard(
-            cardContent=BusinessMessagesCardContent(
-                title='Business Messages!!!',
-                description='This is an example rich card',
-                suggestions=get_sample_suggestions(),
-                media=BusinessMessagesMedia(
-                    height=BusinessMessagesMedia.HeightValueValuesEnum.MEDIUM,
-                    contentInfo=BusinessMessagesContentInfo(
-                        fileUrl=SAMPLE_IMAGES[0],
-                        forceRefresh=False
-                    ))
-                )))
-
-    message_obj = BusinessMessagesMessage(
-        messageId=str(uuid.uuid4().int),
-        representative=BOT_REPRESENTATIVE,
-        richCard=rich_card,
-        fallback=fallback_text)
-
-    send_message(message_obj, conversation_id)
+    
+    # TODO: Use the send_message function to send a rich card
+    # (BusinessMessagesRichCard) with a title, description, 
+    # image, a suggested reply, an action
+    # to open the phone's dialer, and an action to open a URL.
 
 def send_carousel(conversation_id):
     '''
@@ -156,23 +136,12 @@ def send_carousel(conversation_id):
     Args:
         conversation_id (str): The unique id for this user and agent.
     '''
-    rich_card = BusinessMessagesRichCard(carouselCard=get_sample_carousel())
-
-    fallback_text = ''
-
-    # Construct a fallback text for devices that do not support carousels
-    for card_content in rich_card.carouselCard.cardContents:
-        fallback_text += (card_content.title + '\n\n' + card_content.description
-                          + '\n\n' + card_content.media.contentInfo.fileUrl
-                          + '\n---------------------------------------------\n\n')
-
-    message_obj = BusinessMessagesMessage(
-        messageId=str(uuid.uuid4().int),
-        representative=BOT_REPRESENTATIVE,
-        richCard=rich_card,
-        fallback=fallback_text)
-
-    send_message(message_obj, conversation_id)
+    
+    # TODO: Use the send_message function to send a carousel
+    # (BusinessMessagesCarouselCard) using the SAMPLE_IMAGES as the
+    # media elements. Each card should have a title, description,
+    # image, a suggested reply, an action
+    # to open the phone's dialer, and an action to open a URL.
 
 def send_message_with_suggestions(conversation_id):
     '''
@@ -181,14 +150,10 @@ def send_message_with_suggestions(conversation_id):
     Args:
         conversation_id (str): The unique id for this user and agent.
     '''
-    message_obj = BusinessMessagesMessage(
-        messageId=str(uuid.uuid4().int),
-        representative=BOT_REPRESENTATIVE,
-        text='Message with suggestions',
-        fallback='Your device does not support suggestions',
-        suggestions=get_sample_suggestions())
-
-    send_message(message_obj, conversation_id)
+    
+    # TODO: Use the send_message function to send a text message
+    # with chips for a suggested reply, an action
+    # to open the phone's dialer, and an action to open a URL.
 
 def echo_message(message, conversation_id):
     '''
@@ -221,6 +186,18 @@ def send_message(message, conversation_id):
 
     client = bm_client.BusinessmessagesV1(credentials=credentials)
 
+    # Send the typing started event
+    create_request = BusinessmessagesConversationsEventsCreateRequest(
+        eventId=str(uuid.uuid4().int),
+        businessMessagesEvent=BusinessMessagesEvent(
+            representative=BOT_REPRESENTATIVE,
+            eventType=BusinessMessagesEvent.EventTypeValueValuesEnum.TYPING_STARTED
+        ),
+        parent='conversations/' + conversation_id)
+
+    bm_client.BusinessmessagesV1.ConversationsEventsService(
+        client=client).Create(request=create_request)
+
     # Create the message request
     create_request = BusinessmessagesConversationsMessagesCreateRequest(
         businessMessagesMessage=message,
@@ -229,29 +206,17 @@ def send_message(message, conversation_id):
     bm_client.BusinessmessagesV1.ConversationsMessagesService(
         client=client).Create(request=create_request)
 
-def get_sample_carousel():
-    '''
-    Creates a sample carousel rich card.
+    # Send the typing stopped event
+    create_request = BusinessmessagesConversationsEventsCreateRequest(
+        eventId=str(uuid.uuid4().int),
+        businessMessagesEvent=BusinessMessagesEvent(
+            representative=BOT_REPRESENTATIVE,
+            eventType=BusinessMessagesEvent.EventTypeValueValuesEnum.TYPING_STOPPED
+        ),
+        parent='conversations/' + conversation_id)
 
-    Returns:
-       A :obj: A BusinessMessagesCarouselCard object with three cards.
-    '''
-    card_content = []
-
-    for i, sample_image in enumerate(SAMPLE_IMAGES):
-        card_content.append(BusinessMessagesCardContent(
-            title='Card #' + str(i),
-            description='This is a sample card',
-            suggestions=get_sample_suggestions(),
-            media=BusinessMessagesMedia(
-                height=BusinessMessagesMedia.HeightValueValuesEnum.MEDIUM,
-                contentInfo=BusinessMessagesContentInfo(
-                    fileUrl=sample_image,
-                    forceRefresh=False))))
-
-    return BusinessMessagesCarouselCard(
-        cardContents=card_content,
-        cardWidth=BusinessMessagesCarouselCard.CardWidthValueValuesEnum.MEDIUM)
+    bm_client.BusinessmessagesV1.ConversationsEventsService(
+        client=client).Create(request=create_request)
 
 def get_sample_suggestions():
     '''
