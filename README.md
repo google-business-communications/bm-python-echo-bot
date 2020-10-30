@@ -35,7 +35,6 @@ Each sample has a `README.md` with instructions for running the sample.
 | [step1_base](https://github.com/google-business-communications/bm-python-echo-bot/tree/master/step1_base) | Base code for supporting an echo bot on Business Messages. |
 | [step2_rich_features](https://github.com/google-business-communications/bm-python-echo-bot/tree/master/step2_rich_features) | Extension of the base code that contains TODOs to create a rich messaging experience. |
 | [full_sample](https://github.com/google-business-communications/bm-python-echo-bot/tree/master/full_sample) | Complete solution for adding rich features. |
-| [message_validation_sample](https://github.com/google-business-communications/bm-python-echo-bot/tree/master/message_validation_sample) | Demonstrates how to validate messages com from Google. |
 
 ## Learn more
 
