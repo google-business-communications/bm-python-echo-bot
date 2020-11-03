@@ -32,6 +32,34 @@ You must have the following software installed on your machine:
 1. Open the [Create an agent](https://developers.google.com/business-communications/business-messages/guides/set-up/agent)
 guide and follow the instructions to create a Business Messages agent.
 
+### Setup your API authentication credentials
+
+This sample application uses a service account key file to authenticate the Business Messages API calls for your registered Google Cloud project. You must download a service account key and configure it for the sample.
+
+To download a service account key and configure it for the sample, follow the instructions below.
+
+1.  Open [Google Cloud Console](https://console.cloud.google.com) with your
+    Business Messages Google account and make sure you select the project that you registered for Business Messages with.
+
+1.  Create a service account.
+
+    1.   Navigate to [Credentials](https://console.cloud.google.com/apis/credentials).
+
+    2.   Click **Create service account**.
+
+    3.   For **Service account name**, enter your agent's name, then click **Create**.
+
+    4.   For **Select a role**, choose **Project** > **Editor**, then click **Continue**.
+
+    5.   Under **Create key**, choose **JSON**, then click **Create**.
+
+         Your browser downloads the service account key. Store it in a secure location.
+
+    6.  Click **Done**.
+
+    7.  Copy the JSON credentials file into this sample's /resources
+        folder and rename it to "bm-agent-service-account-credentials.json".
+
 ## Deploy the sample
 
 1.  In a terminal, navigate to this sample's root directory.
