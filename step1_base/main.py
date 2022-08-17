@@ -54,6 +54,10 @@ def callback():
 
     app.logger.debug('request_body: %s', json.dumps(request_body))
 
+    # To set a webhook, extract the secret from the request and return it
+    if 'secret' in request_body:
+        return request_body.get('secret')
+
     # Extract the conversation id and message text
     conversation_id = request_body['conversationId']
     app.logger.debug('conversation_id: %s', conversation_id)

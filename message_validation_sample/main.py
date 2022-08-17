@@ -78,6 +78,10 @@ def callback():
     request_body = request.json
     app.logger.debug(request_body)
 
+    # To set a webhook, extract the secret from the request and return it
+    if 'secret' in request_body:
+        return request_body.get('secret')
+
     # Calculate the signature to validate the message is from Google
     partner_key = 'YOUR_PARTNER_KEY'
     generated_signature = base64.b64encode(hmac.new(partner_key.encode(), msg=request.get_data(), digestmod=hashlib.sha512).digest()).decode('UTF-8')
